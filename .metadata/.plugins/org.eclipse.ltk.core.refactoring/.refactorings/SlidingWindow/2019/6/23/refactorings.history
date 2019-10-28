@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;SubStringAnagrams&apos; to &apos;SubstringAnagrams&apos;&#x0A;- Original project: &apos;SlidingWindow&apos;&#x0A;- Original element: &apos;SubStringAnagrams&apos;&#x0A;- Renamed element: &apos;SubstringAnagrams&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;SubStringAnagrams&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;{SubStringAnagrams.java[SubStringAnagrams" matchStrategy="1" name="SubstringAnagrams" qualified="false" references="true" similarDeclarations="false" stamp="1559512268567" textual="false" version="1.0"/>
+</session>

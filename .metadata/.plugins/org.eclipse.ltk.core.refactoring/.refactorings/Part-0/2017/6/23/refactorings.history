@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;Part-0/src/cmsc420/meeshquest/part1/README.readme&apos; to &apos;README.md&apos;" description="Rename resource &apos;README.readme&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/cmsc420/meeshquest/part1/README.readme" name="README.md" stamp="1496699376999" updateReferences="true"/>
+</session>

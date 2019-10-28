@@ -1,0 +1,82 @@
+package cmsc420.meeshquest.part1;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import cmsc420.xml.XmlUtility;
+
+public class MeeshQuest {
+	public  static  Integer width;
+	public  static  Integer height;
+	public static Document Doct;
+    public static void main(String[] args) throws ParserConfigurationException, TransformerException {
+    	Document results = null;
+    	/*create two tree maps store cities according to name and coordinates*/
+        try {
+        	Parser parse=new Parser();
+        //Document doc = XmlUtility.validateNoNamespace(System.in);
+        Document doc = XmlUtility.validateNoNamespace(new File("part1.primary.output.xml"));
+        	results = XmlUtility.getDocumentBuilder().newDocument(); 	
+        	Element commandNode = doc.getDocumentElement();
+        	width=Integer.parseInt(commandNode.getAttribute("spatialWidth"));
+        	height=Integer.parseInt(commandNode.getAttribute("spatialHeight"));
+        	parse.initialize(width,height);
+        	Element first=results.createElement("results");
+        	results.appendChild(first);
+        	/*Initialize the XML output, and every output will be add after first*/
+        	
+        	final NodeList nl = commandNode.getChildNodes();
+        	for (int i = 0; i < nl.getLength(); i++) {
+        		if (nl.item(i).getNodeType() == Document.ELEMENT_NODE) {
+        			commandNode = (Element) nl.item(i);
+        			/*parse create city command*/
+        			if(commandNode.getNodeName().equals("createCity")) {
+        				parse.CreateCity(commandNode, results,first);
+        			/*parse list cities command*/	
+        			}else if(commandNode.getNodeName().equals("listCities")) {
+        				parse.ListCities(commandNode, results,first);
+        			/*parse clear all command*/
+        			}else if(commandNode.getNodeName().equals("clearAll")){
+        				parse.ClearAll(commandNode, results,first);
+        			}else if(commandNode.getNodeName().equals("mapCity")){
+        				parse.mapCity(commandNode,results,first);
+        			}else if(commandNode.getNodeName().equals("printPRQuadtree")) {
+        				parse.printTree(commandNode,results,first);
+        			}else if(commandNode.getNodeName().equals("unmapCity")) {
+        				parse.unmapCity(commandNode,results,first);
+        			}else if(commandNode.getNodeName().equals("deleteCity")){
+        				parse.deleteCity(commandNode,results,first);
+        			}else if(commandNode.getNodeName().equals("saveMap")){
+        				parse.saveMap(commandNode, results, first);
+        			}else if(commandNode.getNodeName().equals("rangeCities")){
+        				parse.rangeCities(commandNode, results, first);
+        			}else if(commandNode.getNodeName().equals("nearestCity")) {
+        				parse.nearestCity(commandNode,results,first);
+        			}else {
+        				throw new SAXException();
+        			}
+        		}
+        	}
+        		XmlUtility.print(results);
+        } catch (SAXException | IOException | ParserConfigurationException e) {
+        	/* TODO: Process fatal error here */
+        		Doct = XmlUtility.getDocumentBuilder().newDocument();
+			Element elt = Doct.createElement("fatalError");
+			Doct.appendChild(elt);
+			XmlUtility.print(Doct);
+		}
+    }
+}
+

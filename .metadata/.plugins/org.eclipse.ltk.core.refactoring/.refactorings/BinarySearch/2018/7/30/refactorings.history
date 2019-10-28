@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;LongestPalindrom.java&apos; to &apos;LongestPanlindrom.java&apos;&#x0A;- Original project: &apos;BinarySearch&apos;&#x0A;- Original element: &apos;LongestPalindrom.java&apos;&#x0A;- Renamed element: &apos;LongestPanlindrom.java&apos;" description="Rename compilation unit &apos;LongestPalindrom.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;{LongestPalindrom.java" name="LongestPanlindrom.java" references="false" stamp="1532224015275" version="1.0"/>
+</session>

@@ -1,0 +1,558 @@
+package cmsc420.meeshquest.part1;
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+
+import cmsc420.drawing.CanvasPlus;
+import cmsc420.xml.XmlUtility;
+import org.w3c.dom.Element;
+
+
+public class PRQuadTree<T extends Point2D.Float> {
+	public PRQuadNode root;
+	public Frame frame;
+	public ArrayList<String> cityList;
+	public int total;
+
+	public PRQuadTree(Frame frame) {
+		this.cityList=new ArrayList<String>();
+		this.frame=frame;
+		this.root= null;
+		this.total=0;
+	}
+
+	public int getPlace(Cities city, Frame frame) {
+		if((city.x>=frame.x1) && (city.x<(frame.x2+frame.x1)/2) && (city.y>=(frame.y2+frame.y1)/2)  && (city.y<frame.y2)){
+			return 1;
+		}else if((city.x>=(frame.x2+frame.x1)/2) && (city.x<frame.x2) && (city.y>=(frame.y2+frame.y1)/2) &&(city.y<frame.y2)) {
+			return 2;
+		}else if((city.x>=frame.x1) && (city.x<(frame.x2+frame.x1)/2) && (city.y>=frame.y1)  && (city.y<(frame.y2+frame.y1)/2)) {
+			return 3;
+		}else if((city.x>=(frame.x2+frame.x1)/2) && (city.x<frame.x2) && (city.y>=frame.y1) &&(city.y<(frame.y2+frame.y1)/2)) {
+			return 4;
+		}
+		return 0;
+	}
+
+	public PRQuadNode insert(Cities  city) {
+		int place=getPlace(city, this.frame);
+		PRQuadNode newnode=normalInsert(this.root,null,city,this.frame,place);
+		cityList.add(city.name); 
+		this.total++;
+		return newnode;
+	}
+
+	public PRQuadNode normalInsert(PRQuadNode current, PRQuadNode parent, Cities mapcity, Frame frame
+			, int place) {
+		/**
+		 * Adds a city to the node. If an empty node, the node becomes a leaf
+		 * node. If a leaf node already, the leaf node becomes an internal node
+		 * and both cities are added to it. If an internal node, the city is
+		 * added to the child whose quadrant the city is located within.
+		 **/
+		if(current==null) {
+			PRQuadNode newnode=new PRQuadLeaf(frame,parent,mapcity);
+			if(parent!=null) {
+				PRQuadBranch branch=(PRQuadBranch) parent;
+				if(place == 1) {
+					branch.UpperLeft=newnode;
+				}else if(place == 2) {
+					branch.UpperRight=newnode;
+				}else if(place == 3) {
+					branch.BottomLeft=newnode;
+				}else if(place== 4) {
+					branch.BottomRight=newnode;
+				}else {
+					return null;
+				}
+				branch.num++;
+			}else {
+				this.root=newnode;
+			}
+			return newnode;
+		}
+		if (current instanceof PRQuadLeaf) {
+			PRQuadLeaf currentnode=(PRQuadLeaf) current;
+			PRQuadBranch branch=new PRQuadBranch(frame,parent);
+			if(current.parent!=null) {
+				PRQuadBranch parentnode=(PRQuadBranch) current.parent;
+				if(place== 1) {
+					parentnode.UpperLeft=branch;
+				}else if(place == 2) {
+					parentnode.UpperRight=branch;
+				}else if(place == 3) {
+					parentnode.BottomLeft=branch;
+				}else if(place == 4) {
+					parentnode.BottomRight=branch;
+				}else {
+					return null;
+				}
+			}else {
+				this.root=branch;
+			}
+			divideAndAdd(branch, currentnode.city);
+			return divideAndAdd(branch, mapcity);
+		}
+		if(current instanceof PRQuadBranch){
+			PRQuadBranch branch=(PRQuadBranch) current;
+			if (parent!=null) {
+				branch.parent=parent;
+			}else {
+				this.root=branch;
+			}
+			return divideAndAdd(branch, mapcity);
+		}
+		return null;
+	}
+
+	public PRQuadNode divideAndAdd(PRQuadBranch branch, Cities city) {
+		double newx=(branch.frame.x2+branch.frame.x1)/2;
+		double newy=(branch.frame.y2+branch.frame.y1)/2;
+		int place=getPlace(city,branch.frame);
+		if(place ==1) {
+			Frame newframe=new Frame(branch.frame.x1,newy,newx,branch.frame.y2);
+			return normalInsert(branch.UpperLeft,branch, city, newframe,place);
+		}else if(place ==2) {
+			Frame newframe=new Frame(newx,newy,branch.frame.x2,branch.frame.y2);
+			return normalInsert(branch.UpperRight,branch,city, newframe, place);
+		}else if (place ==3) {
+			Frame newframe=new Frame(branch.frame.x1,branch.frame.y1,newx,newy);
+			return normalInsert(branch.BottomLeft,branch,city, newframe,place);
+		}else if(place ==4) {
+			Frame newframe=new Frame(newx,branch.frame.y1, branch.frame.x2,newy);
+			return normalInsert(branch.BottomRight, branch, city,newframe, place);
+		}
+		return null;
+	}
+
+	public boolean contains(String cityname) {
+		return cityList.contains(cityname);
+	}
+
+	public void printTree(Element element, Document doc) {
+		printHelper(this.root, element, doc);
+	}
+
+	private void printHelper(PRQuadNode current, Element results, Document doc) {
+		if (current == null) {
+			Element white = doc.createElement("white");
+			results.appendChild(white);
+		}
+		if (current instanceof PRQuadLeaf) {
+			Element black = doc.createElement("black");
+			results.appendChild(black);
+			PRQuadLeaf node=(PRQuadLeaf) current;
+			black.setAttribute("name", node.city.name);
+			black.setAttribute("x", String.valueOf(Math.round(node.city.x)));
+			black.setAttribute("y", String.valueOf(Math.round(node.city.y)));
+		} else if (current instanceof PRQuadBranch) {
+			Element gray = doc.createElement("gray");
+			results.appendChild(gray);
+			PRQuadBranch node = (PRQuadBranch) current;
+			gray.setAttribute("x", String.valueOf(Math.round((node.frame.x1 + node.frame.x2) / 2)));
+			gray.setAttribute("y", String.valueOf(Math.round((node.frame.y1 + node.frame.y2) / 2)));
+			printHelper(node.UpperLeft, gray, doc);
+			printHelper(node.UpperRight, gray, doc);
+			printHelper(node.BottomLeft, gray, doc);
+			printHelper(node.BottomRight, gray, doc);
+		}
+	}
+
+	public boolean isEmpty() {
+		if(total==0) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean remove(Cities unmapcity) {
+		PRQuadNode here=searchNode(unmapcity,this.root);
+		boolean flag=normalremove(here);
+		cityList.remove(unmapcity.name);
+		this.total--;
+		return flag;
+	}
+
+	public boolean normalremove(PRQuadNode current) {
+		/* Removes a city from the node. If this is a leaf node and the city is
+		 * contained in it, the city is removed and the node becomes a leaf
+		 * node. If this is an internal node, then the removal command is passed
+		 * down to the child node whose quadrant the city falls in.*/
+			PRQuadLeaf node=(PRQuadLeaf) current;
+			if(current.parent!=null) {
+				PRQuadBranch branch=(PRQuadBranch) node.parent;
+				if(branch.UpperLeft==node) {
+					branch.UpperLeft=null;
+				}else if(branch.BottomLeft==node) {
+					branch.BottomLeft=null;
+				}else if(branch.UpperRight==node) {
+					branch.UpperRight=null;
+				}else if(branch.BottomRight==node) {
+					branch.BottomRight=null;
+				}
+				branch.num--;
+			}else {
+				this.root=null;
+			}
+		
+		collapseParent(current.parent);
+		return true;
+	}
+
+	public void collapseParent(PRQuadNode current) {
+		if(current==null) {
+			return;
+		}
+			PRQuadBranch branch=(PRQuadBranch) current;
+			PRQuadNode children=null;
+			if(branch.num>=2) {
+				return;
+			}	
+
+			if(branch.num==1) {
+				if(branch.UpperLeft!=null) {
+					children=branch.UpperLeft;
+				}else if(branch.UpperRight!=null) {
+					children=branch.UpperRight;
+				}else if(branch.BottomLeft!=null) {
+					children=branch.BottomLeft;
+				}else if(branch.BottomRight!=null) {
+					children=branch.BottomRight;
+				}else {
+					children=null;
+				}
+			}
+
+			if(!(children instanceof PRQuadBranch)) {
+				if(current.parent==null) {
+					this.root=children;
+					children.parent=null;
+					children.frame.x1=this.frame.x1;
+					children.frame.x2=this.frame.x2;
+					children.frame.y1=this.frame.y1;
+					children.frame.y2=this.frame.y2;
+				}else {
+					PRQuadBranch parent=(PRQuadBranch) current.parent;
+					if(children==null) {
+						parent.num--;
+					}
+
+					if(children!=null) {
+						children.parent=parent;
+					}	
+					
+					if(parent.UpperLeft==branch) {
+						parent.UpperLeft=children;
+						if(children instanceof PRQuadLeaf) {
+							children.frame.x1=parent.frame.x1;
+							children.frame.y1=parent.frame.y1;
+							children.frame.x2=parent.frame.x2;
+							children.frame.y2=parent.frame.y2;
+						}
+					}else if(parent.UpperRight==branch) {
+						parent.UpperRight=children;
+						if(children instanceof PRQuadLeaf) {
+							children.frame.x1=parent.frame.x1;
+							children.frame.y1=parent.frame.y1;
+							children.frame.x2=parent.frame.x2;
+							children.frame.y2=parent.frame.y2;
+						}
+					}else if(parent.BottomLeft==branch) {
+						parent.BottomLeft=children;
+						if(children instanceof PRQuadLeaf) {
+							children.frame.x1=parent.frame.x1;
+							children.frame.y1=parent.frame.y1;
+							children.frame.x2=parent.frame.x2;
+							children.frame.y2=parent.frame.y2;
+						}
+					}else if(parent.BottomRight==branch) {
+						parent.BottomRight=children;
+						if(children instanceof PRQuadLeaf) {
+							children.frame.x1=parent.frame.x1;
+							children.frame.y1=parent.frame.y1;
+							children.frame.x2=parent.frame.x2;
+							children.frame.y2=parent.frame.y2;
+						}
+					}else {
+						return;
+					}
+				}	
+			}
+		collapseParent(current.parent);
+	}
+
+	public PRQuadNode searchNode(Cities city, PRQuadNode current) {
+		if(current instanceof PRQuadLeaf) {
+			PRQuadLeaf node=(PRQuadLeaf) current;
+			if(node.city.name.equals(city.name)) {
+				return node;
+			}
+			return null;
+		}
+		if(current instanceof PRQuadBranch) {
+			PRQuadBranch branch=(PRQuadBranch) current;
+			int place=getPlace(city,branch.frame);
+			if(place==1) {
+				return searchNode(city,branch.UpperLeft);
+			}else if(place ==2) {
+				return searchNode(city,branch.UpperRight);
+			}else if(place ==3) {
+				return searchNode(city,branch.BottomLeft);
+			}else if(place ==4) {
+				return searchNode(city,branch.BottomRight);
+			}
+		}
+		return null;
+	}
+
+	public void saveMap(CanvasPlus canvas,String filename) {
+		drawTree(canvas, this.root);
+		try {
+			canvas.save(filename);
+		} catch (IOException e) {
+			
+		}
+		canvas.dispose();
+	}
+
+	public void drawTree(CanvasPlus canvas, PRQuadNode current) {
+		if (current instanceof PRQuadLeaf) {
+			canvas.addPoint(((PRQuadLeaf) current).city.name, 
+					((PRQuadLeaf) current).city.x,
+					((PRQuadLeaf) current).city.y, 
+					Color.BLACK);
+		}
+
+		if(current instanceof PRQuadBranch) {
+			PRQuadBranch branch=(PRQuadBranch) current;
+			canvas.addLine(branch.frame.x1, (branch.frame.y1+branch.frame.y2)/2,
+					branch.frame.x2, (branch.frame.y1+branch.frame.y2)/2,Color.BLACK);
+			canvas.addLine((branch.frame.x1+branch.frame.x2)/2,branch.frame.y1, 
+					(branch.frame.x1+branch.frame.x2)/2,branch.frame.y2,Color.BLACK);
+			drawTree(canvas,branch.UpperLeft);
+			drawTree(canvas,branch.UpperRight);
+			drawTree(canvas,branch.BottomLeft);
+			drawTree(canvas,branch.BottomRight);
+		}
+	}
+
+	public ArrayList<String> rangeSearch(int xcoord, int ycoord, int range) {
+		ArrayList<String> list=searchRange(this.root,xcoord,ycoord,range);
+		list.sort(Collections.reverseOrder());
+		return list;
+	}
+
+	private ArrayList<String> searchRange(PRQuadNode current, int xcoord, int ycoord,int range) {
+		ArrayList<String> list=new ArrayList<String>();
+		if(current instanceof PRQuadLeaf) {
+			if (inRange((PRQuadLeaf) current,xcoord,ycoord,range)) {
+				list.add(((PRQuadLeaf) current).city.name);
+				return list;
+			}
+		}
+		if(current instanceof PRQuadBranch) {
+			PRQuadBranch branch=(PRQuadBranch) current;
+			if(inRange(branch.UpperLeft,xcoord,ycoord,range) && branch.UpperLeft!=null) {
+				list.addAll(searchRange(branch.UpperLeft,xcoord,ycoord,range));
+			}
+			if(inRange(branch.UpperRight,xcoord,ycoord,range) && branch.UpperRight!=null) {
+				list.addAll(searchRange(branch.UpperRight,xcoord,ycoord,range));
+			}
+			if(inRange(branch.BottomLeft,xcoord,ycoord,range) && branch.BottomLeft!=null) {
+				list.addAll(searchRange(branch.BottomLeft,xcoord,ycoord,range));
+			}
+			if(inRange(branch.BottomRight,xcoord,ycoord,range) && branch.BottomRight!=null) {
+				list.addAll(searchRange(branch.BottomRight,xcoord,ycoord,range));
+			}
+			return list;
+		}
+		return list;
+	}
+
+	private boolean inRange(PRQuadNode current, int xcoord, int ycoord, int range) {
+		if(current instanceof PRQuadLeaf) {
+			PRQuadLeaf leaf=(PRQuadLeaf) current;
+			double distance=getDistance(leaf.city.x,leaf.city.y,xcoord,ycoord);
+			if(distance<=range) {
+				return true;
+			}
+		}
+		
+		if(current instanceof PRQuadBranch) {
+			PRQuadBranch branch=(PRQuadBranch) current;
+			double x1=branch.frame.x1;
+			double y1=branch.frame.y1;
+			double x2=branch.frame.x2;
+			double y2=branch.frame.y2;
+			double distance1=getDistance(x1,y1,xcoord,ycoord);
+			double distance2=getDistance(x1,y2,xcoord,ycoord);
+			double distance3=getDistance(x2,y1,xcoord,ycoord);
+			double distance4=getDistance(x2,y2,xcoord,ycoord);
+			if(distance1<=range || distance2<=range || distance3<=range || distance4<=range) {
+				return true;
+			}
+			if (xcoord-range<= branch.frame.x2 && xcoord-range >= branch.frame.x1 
+					&& ycoord <= branch.frame.y2 && ycoord >= branch.frame.y1) {
+				return true;
+			}
+			if(xcoord+range<= branch.frame.x2 && xcoord+range >= branch.frame.x1 
+					&& ycoord <= branch.frame.y2 && ycoord >= branch.frame.y1) {
+				return true;
+			}
+			if(xcoord<= branch.frame.x2 && xcoord >= branch.frame.x1 
+					&& ycoord-range <= branch.frame.y2 && ycoord-range >= branch.frame.y1) {
+				return true;
+			}
+			if(xcoord<= branch.frame.x2 && xcoord >= branch.frame.x1 
+					&& ycoord+range <= branch.frame.y2 && ycoord+range >= branch.frame.y1) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public double getDistance(double x1, double y1, double x2, double y2) {
+		return Math.sqrt( Math.pow(y1 - y2, 2)+Math.pow(x1 - x2, 2));		
+	}
+
+	public String nearestCity(int xcoord, int ycoord) {
+		String cityname=null;
+		if(this.root!=null) {
+		PriorityQueue<PRQuadEle> queue=new PriorityQueue<PRQuadEle>(new PriorityQueueComparator());
+		PRQuadEle node=new PRQuadEle(this.root,null,0);
+		queue.add(node);
+		while(!queue.isEmpty()){
+			PRQuadEle ele=queue.poll();
+			if(ele.node instanceof PRQuadLeaf) {
+				cityname=ele.name;
+				break;
+			}
+			priorityAdd(queue,ele, xcoord, ycoord);
+		}
+		}
+		return cityname;
+	}
+
+	public void priorityAdd(PriorityQueue<PRQuadEle> queue, PRQuadEle current,int x ,int y) {
+		if(current.node instanceof PRQuadBranch) {
+			PRQuadBranch branch=(PRQuadBranch) current.node;
+			if(branch.UpperLeft!=null) {
+				PRQuadEle ele=null;
+				if(branch.UpperLeft instanceof PRQuadLeaf) {
+					double distance=getDistance(((PRQuadLeaf)branch.UpperLeft).city.x,
+							((PRQuadLeaf)branch.UpperLeft).city.y, x, y);
+					ele=new PRQuadEle(branch.UpperLeft,((PRQuadLeaf)branch.UpperLeft).city.name,distance);
+				}
+				if(branch.UpperLeft instanceof PRQuadBranch) {
+					PRQuadBranch center=(PRQuadBranch) branch.UpperLeft;
+					//double distance=getDistance((center.frame.x1+center.frame.x2)/2,(center.frame.y1+center.frame.y2),x,y);
+					double distance=getFrameDistance(center,x,y);
+					ele=new PRQuadEle(branch.UpperLeft,null,distance);	
+				}
+				queue.add(ele);
+			}
+			
+			if(branch.UpperRight!=null) {
+				PRQuadEle ele=null;
+				if(branch.UpperRight instanceof PRQuadLeaf) {
+					double distance=getDistance(((PRQuadLeaf)branch.UpperRight).city.x,
+							((PRQuadLeaf)branch.UpperRight).city.y, x, y);
+					ele=new PRQuadEle(branch.UpperRight,((PRQuadLeaf)branch.UpperRight).city.name,distance);
+				}
+				if(branch.UpperRight instanceof PRQuadBranch) {
+					PRQuadBranch center=(PRQuadBranch) branch.UpperRight;
+					//double distance=getDistance((center.frame.x1+center.frame.x2)/2,(center.frame.y1+center.frame.y2),x,y);
+					double distance=getFrameDistance(center,x,y);
+					ele=new PRQuadEle(branch.UpperRight,null,distance);
+				}
+				queue.add(ele);
+			}
+			
+			if(branch.BottomRight!=null) {
+				PRQuadEle ele=null;
+				if(branch.BottomRight instanceof PRQuadLeaf) {
+					double distance=getDistance(((PRQuadLeaf)branch.BottomRight).city.x,
+							((PRQuadLeaf)branch.BottomRight).city.y, x, y);
+					ele=new PRQuadEle(branch.BottomRight,((PRQuadLeaf)branch.BottomRight).city.name,distance);
+					
+				}
+				if(branch.BottomRight instanceof PRQuadBranch) {
+					PRQuadBranch center=(PRQuadBranch) branch.BottomRight;
+					//double distance=getDistance((center.frame.x1+center.frame.x2)/2,(center.frame.y1+center.frame.y2),x,y);
+					double distance=getFrameDistance(center,x,y);
+					ele=new PRQuadEle(branch.BottomRight,null,distance);
+				}
+				queue.add(ele);
+			}
+			
+			if(branch.BottomLeft!=null) {
+				PRQuadEle ele=null;
+				if(branch.BottomLeft instanceof PRQuadLeaf) {
+					double distance=getDistance(((PRQuadLeaf)branch.BottomLeft).city.x,
+							((PRQuadLeaf)branch.BottomLeft).city.y, x, y);
+					ele=new PRQuadEle(branch.BottomLeft,((PRQuadLeaf)branch.BottomLeft).city.name,distance);
+				
+				}
+				if(branch.BottomLeft instanceof PRQuadBranch) {
+					PRQuadBranch center=(PRQuadBranch) branch.BottomLeft;
+					//double distance=getDistance((center.frame.x1+center.frame.x2)/2,(center.frame.y1+center.frame.y2),x,y);
+					double distance=getFrameDistance(center,x,y);
+					ele=new PRQuadEle(branch.BottomLeft,null,distance);
+				}
+					queue.add(ele);
+			}		
+		}
+	}
+	
+	public double getFrameDistance(PRQuadBranch branch, int x, int y) {
+		if (x < branch.frame.x1 && y >= branch.frame.y2) {
+			return getDistance(branch.frame.x1, branch.frame.y2, x, y);
+		} else if (x >= branch.frame.x1 && x < branch.frame.x2 && y > branch.frame.y2) {
+			return y - branch.frame.y2;
+		} else if (x >= branch.frame.x2 && y >= branch.frame.y2) {
+			return getDistance(branch.frame.x2, branch.frame.y2, x, y);
+		} else if (x < branch.frame.x1 && y >= branch.frame.y1 && y < branch.frame.y2) {
+			return branch.frame.x1 - x;
+		} else if (x >= branch.frame.x1 && x < branch.frame.x2 && y >= branch.frame.y1 && y < branch.frame.y2) {
+			return 0;
+		} else if (x > branch.frame.x2 && y >= branch.frame.y1 && y < branch.frame.y2) {
+			return x - branch.frame.x2;
+		} else if (x < branch.frame.x1 && y < branch.frame.y1) {
+			return getDistance(branch.frame.x1, branch.frame.y1, x, y);
+		} else if (x >= branch.frame.x1 && x < branch.frame.x2 && y < branch.frame.x1) {
+			return branch.frame.y1 - y;
+		} else if (x >= branch.frame.x2 && y < branch.frame.y1) {
+			return getDistance(branch.frame.x2, branch.frame.y1, x, y);
+		}
+		return 0;
+	}
+	
+	public void drawCircle(CanvasPlus canvas, Integer x, Integer y, Integer radius) {
+		canvas.addCircle(x, y, radius, Color.BLUE,false);
+	}
+
+	public void clear() {
+		this.total=0;
+		this.cityList.clear();
+		this.root=null;
+	}
+}

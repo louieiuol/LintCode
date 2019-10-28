@@ -1,0 +1,32 @@
+//928. Longest Substring with At Most Two Distinct Characters
+//中文English
+//Given a string, find the length of the longest substring T that contains at most 2 distinct characters.
+
+import java.util.*;
+public class LongestSubStringAtMostTwo {
+	public int longestSubStringAtMostTwo(String s) {
+		if(s == null || s.length() == 0) return 0;
+		HashMap<Character, Integer> map=new HashMap<>();
+		int i=0;
+		int max=0;
+		int l=0;
+		while(i < s.length()) {
+			if(map.size() <= 2) {
+				char c=s.charAt(i);
+				map.put(c, i);
+				i++;
+			}
+			if(map.size() > 2) {
+				int left=s.length();
+				for(int index: map.values()) {
+					left=Math.min(left, index);
+				}
+				char c=s.charAt(left);
+				map.remove(c);
+				l=left+1;
+			}
+			max=Math.max(max, i-l);
+		}
+		return max;
+	}
+}

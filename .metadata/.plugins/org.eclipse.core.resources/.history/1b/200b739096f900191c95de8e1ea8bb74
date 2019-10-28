@@ -1,0 +1,8 @@
+//928. Longest Substring with At Most Two Distinct Characters
+//中文English
+//Given a string, find the length of the longest substring T that contains at most 2 distinct characters.
+
+
+public class LongestSubStringAtMostTwo {
+
+}

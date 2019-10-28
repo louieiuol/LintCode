@@ -1,0 +1,12 @@
+1500673695225	Delete element
+1500684778808	Rename type 'GuardedAvlGTree'
+1500684824419	Rename type 'Dijkstranator'
+1500684839255	Rename type 'DijkstraEngine'
+1500684855370	Rename type 'Dictionary'
+1500685037631	Rename type 'Metropole'
+1500694411499	Rename type 'RoadAdjacencyList'
+1500694696250	Rename type 'RoadNotMappedThrowable'
+1500694711733	Rename type 'PartitionTooSmallThrowable'
+1500694721253	Rename type 'OffRoadPt'
+1500694740664	Rename type 'CityNotMappedThrowable'
+1500694763970	Rename type 'RealCity'

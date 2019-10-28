@@ -1,0 +1,35 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class TopologicalSorting {
+	   class DirectedGraphNode {
+		      int label;
+		      ArrayList<DirectedGraphNode> neighbors;
+		      DirectedGraphNode(int x) { 
+		    	  label = x; neighbors = new ArrayList<DirectedGraphNode>(); 
+		      }
+		  }
+	    /*
+	     * @param graph: A list of Directed graph node
+	     * @return: Any topological order for the given graph.
+	     */
+	    public ArrayList<DirectedGraphNode> topSort(ArrayList<DirectedGraphNode> graph) {
+	        // write your code here
+	    	ArrayList<DirectedGraphNode> result=new ArrayList<DirectedGraphNode>();
+	    	if(graph!=null) {
+	    		if(graph.size() >0) {
+	    			HashMap<DirectedGraphNode, ArrayList<DirectedGraphNode>> map=new HashMap<DirectedGraphNode, ArrayList<DirectedGraphNode>>();
+	    			Queue<DirectedGraphNode> queue=new LinkedList<DirectedGraphNode>();
+	    			for(DirectedGraphNode node: graph) {
+	    				map.put(node, node.neighbors);
+	    			}
+	    			for(DirectedGraphNode node: map.keySet()) {
+	    				if(map.get(node).contains(node))
+	    			}
+	    		}
+	    	}
+	    	return result;
+	    }
+}

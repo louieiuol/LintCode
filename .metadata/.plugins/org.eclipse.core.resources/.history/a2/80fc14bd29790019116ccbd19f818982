@@ -1,0 +1,41 @@
+import java.util.*;
+public class SpiralMatrix {
+	public List<Integer> spiralOrder(int[][] matrix) {
+        // write your code here
+        List<Integer> res=new ArrayList<Integer>();
+        if(matrix == null || matrix.length == 0 || matrix[0].length == 0) return res;
+        int steps=0;
+        int minRow=0;
+        int maxRow=matrix.length-1;
+        int minCol=0;
+        int maxCol=matrix[0].length-1;
+        while(minRow<=maxRow && minCol<=maxCol){
+            if(steps % 4 == 0){
+                for(int i=minCol; i<=maxCol; i++){
+                    res.add(matrix[minRow][i]);
+                }
+                minRow++;
+            }
+            if(steps % 4 == 1){
+                for(int i=minRow; i<=maxRow; i++){
+                    res.add(matrix[i][maxCol]);
+                } 
+                maxCol--;
+            }
+            if(steps % 4 == 2){
+                for(int i=maxCol; i>=minCol; i--){
+                    res.add(matrix[maxRow][i]);
+                }
+                maxRow--;
+            }
+            if(steps % 4 == 3){
+                for(int i=maxRow; i>=minRow; i--){
+                    res.add(matrix[i][minCol]);
+                }
+                minCol++;
+            }
+            steps++;
+        }
+        return res;
+    }
+}

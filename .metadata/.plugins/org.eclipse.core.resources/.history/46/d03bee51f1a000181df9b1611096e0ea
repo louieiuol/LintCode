@@ -1,0 +1,7 @@
+
+public class CourseSchedule {
+	public boolean canFinish(int numCourses, int[][] prerequisites) {
+        // write your code here
+        
+    }
+}

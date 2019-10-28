@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;IntSet&apos; to &apos;IntSetModified&apos;&#x0A;- Original project: &apos;HW10&apos;&#x0A;- Original element: &apos;IntSet&apos;&#x0A;- Renamed element: &apos;IntSetModified&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;IntSet&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;{IntSet.java[IntSet" matchStrategy="1" name="IntSetModified" qualified="false" references="true" similarDeclarations="false" stamp="1555864208523" textual="false" version="1.0"/>
+</session>
