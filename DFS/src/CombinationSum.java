@@ -55,6 +55,10 @@ public class CombinationSum {
                 continue;
             }
             //除去所有重复情况
+            if(candidates[i] > target) {
+            	break;
+            }
+            //剪枝
             lst.add(candidates[i]);
             dfs(candidates, i, lst, target-candidates[i]);
             //index 还是当前 index,下次dfs 还是从当前index开始 考虑了重复情况

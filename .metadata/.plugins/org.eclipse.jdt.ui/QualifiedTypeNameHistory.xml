@@ -54,10 +54,10 @@
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="NaturalSet"/>
     <fullyQualifiedTypeName name="java.util.Stack"/>
-    <fullyQualifiedTypeName name="java.util.Arrays"/>
     <fullyQualifiedTypeName name="java.util.Comparator"/>
     <fullyQualifiedTypeName name="org.junit.experimental.theories.Theory"/>
     <fullyQualifiedTypeName name="org.junit.experimental.theories.DataPoints"/>
     <fullyQualifiedTypeName name="org.junit.experimental.theories.Theories"/>
     <fullyQualifiedTypeName name="org.junit.runner.RunWith"/>
+    <fullyQualifiedTypeName name="java.util.Arrays"/>
 </qualifiedTypeNameHistroy>

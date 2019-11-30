@@ -1,0 +1,43 @@
+
+public class KthLargestElements {
+	 public int kthLargestElement(int k, int[] nums) {
+		 	if(nums == null || nums.length == 0|| k < 1 || k > nums.length ) return -1;
+	        // write your code here
+	        return quickSelect(nums, 0, nums.length - 1, nums.length-k);
+	    }
+
+	    private int quickSelect(int[] nums, int left, int right, int k) {
+	    	if(left >= right) return nums[k];
+	    	
+	        int pivot = nums[left+(right-left)/2];
+	        int i = left, j = right;
+	        while (i <= j) {
+	            while (i <= j && nums[i] < pivot) {
+	                i++;
+	            }
+	            while (i <= j && nums[j] > pivot) {
+	                j--;
+	            }
+	            if (i <= j) {
+	            	swap(nums, i, j);
+	                i++;
+	                j--;
+	            }
+	        }
+
+	        if (left + k - 1 <= j) {
+	            return quickSelect(nums, left, j, k);
+	        }
+	        if (left + k - 1 >= i) {
+	            return quickSelect(nums, i, right, k - (i - left));
+	        }
+	        
+	        return nums[j + 1];
+	    }
+	    
+	    private void swap(int[] nums, int a ,int b) {
+            int tmp = nums[a];
+            nums[a] = nums[b];
+            nums[b] = tmp;	    	
+	    }
+}

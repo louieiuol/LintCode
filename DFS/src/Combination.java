@@ -23,17 +23,19 @@ public class Combination {
             result.add(new ArrayList<Integer>());
             return result;
         }
+        //放入第一个数字 放入最后一个数字 n 
         dfs(n, 1, k, new ArrayList<Integer>());
         //we don't want duplicates, so we need a index to start 
         return result;
     }
     private void dfs(int n, int index, int k, ArrayList<Integer> lst){
         if(lst.size() == k){
-        	//递归的出口
+        	// lst长度为k时候 加入结果 
             result.add(new ArrayList<Integer>(lst));
             return;
         }
         for(int i=index; i<=n; i++){
+        	//每次都从index开始 
             lst.add(i);
             dfs(n, i+1, k, lst);
             //走到下一个元素，避免重复

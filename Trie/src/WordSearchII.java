@@ -44,6 +44,7 @@ public class WordSearchII {
 			this.children[pos].insert(word, index+1);
 		}
 	}
+	
 	TrieNode root=new TrieNode();
 	List<String> result=new ArrayList<>();
 	int[] dx= {0,0,-1,1};
@@ -55,6 +56,7 @@ public class WordSearchII {
     	}
     	for(int i=0; i<board.length; i++) {
     		for(int j=0; j<board[0].length; j++) {
+    			//进去后处理情况的话不需要外面回溯 
     			search(board, i, j, root);
     		}
     	}
@@ -62,18 +64,22 @@ public class WordSearchII {
     }
     
     private void search(char[][] board, int x, int y, TrieNode curr) {
+    	//一进来先判断是否可行 
     	if(curr.children[board[x][y]] == null) {
     		return;
     	}
     	if(curr.word != null && !result.contains(curr.word)) {
     		result.add(curr.word);
+    		//注意找到一个不要return 可能在同一prefix下有多个 
     	}
+    	//当前格子回溯 
     	char temp=board[x][y];
     	board[x][y]=0;
     	for(int i=0; i<4; i++) {
     		int nextX=x+dx[i];
     		int nextY=y+dy[i];
     		if(nextX >=0 && nextX <board.length && nextY >=0 && nextY < board[0].length && board[x][y]!=0) {
+    			//这里直接带入参数即可 不要回溯 
     			search(board, nextX, nextY, curr.children[board[x][y]]);
     		}
     	}
