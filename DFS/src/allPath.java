@@ -35,23 +35,22 @@ public class allPath {
             return res;
         }
         
-        private void dfs(HashMap<Integer, ArrayList<Integer>> map, int num,
-        int dest, ArrayList<Integer> lst){
-            if(num == 0){
-                lst.add(0);
+        private void dfs(HashMap<Integer, ArrayList<Integer>> map, int source,
+        int dest, ArrayList<Integer> path){
+            if(source == 0){
+                path.add(0);
             }
-            if(num == dest){
-                res.add(lst);
+            if(source == dest){
+                res.add(new ArrayList<>(path));
                 return;
             }
-            ArrayList<Integer> curr=map.get(num);
-            if(curr.size()>0){
-                for(int point: curr){        
-                    ArrayList<Integer> newlist=new ArrayList<Integer>();
-                    newlist.addAll(lst);
-                    newlist.add(point);
-                    dfs(map, point, dest, newlist);
-                }
+            if(map.getOrDefault(source, new ArrayList<>()).size() == 0){
+                return;
+            }
+            for(int next: map.get(source)){
+                path.add(next);
+                dfs(map, next, dest, path);
+                path.remove(path.size()-1);
             }
         }
 }
