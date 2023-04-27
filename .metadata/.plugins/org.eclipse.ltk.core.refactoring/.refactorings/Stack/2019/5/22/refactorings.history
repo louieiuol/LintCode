@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Move element &apos;FlattenNestedListIterator.java&apos; to &apos;Iterator/src&apos;&#x0A;- Original project: &apos;Stack&apos;&#x0A;- Destination element: &apos;Iterator/src&apos;&#x0A;- Original element: &apos;FlattenNestedListIterator.java&apos;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="=Iterator/src" element1="/src&lt;{FlattenNestedListIterator.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1559268804428" units="1" version="1.0"/>
-</session>

@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Move element &apos;LongestLineofConsecutiveOneinMatrix.java&apos; to &apos;Matrix&apos;&#x0A;- Original project: &apos;DP&apos;&#x0A;- Destination element: &apos;Matrix&apos;&#x0A;- Original element: &apos;LongestLineofConsecutiveOneinMatrix.java&apos;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="=Matrix" element1="/src&lt;{LongestLineofConsecutiveOneinMatrix.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1561849946174" units="1" version="1.0"/>
-</session>
